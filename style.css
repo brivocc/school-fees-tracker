@@ -74,3 +74,13 @@ dialog::backdrop { background: rgba(17,35,28,.5); }
   dialog { position: absolute; inset: 0; width: 100%; box-shadow: none; }
   .stmt-actions { display: none; }
 }
+
+/* More projects by Bevon Manyara */
+.bm-more { background: #0f172a; color: #cbd5e1; padding: 18px 16px 22px; text-align: center; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: .9rem; }
+.bm-more p { margin: 0 0 .6rem; }
+.bm-more a { color: #fff; }
+.bm-more nav { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; }
+.bm-more nav a { text-decoration: none; padding: .35rem .8rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.2); }
+.bm-more nav a:hover { background: rgba(255,255,255,.1); }
+.bm-more .bm-port { background: #4f46e5; border-color: #4f46e5; }
+@media print { .bm-more { display: none; } }
