@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>School Fees Tracker · Charges, M-Pesa payments &amp; balances</title>
+  <meta name="description" content="A browser app to track school fees: learners, term charges, M-Pesa/bank payments, balances, statements and CSV export. By Bevon Manyara.">
+  <meta name="theme-color" content="#0f3d2e">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="app-head">
+  <div class="wrap head-inner">
+    <div class="brand"><span class="logo">KES</span><div><strong>School Fees Tracker</strong><small>Charges · payments · balances</small></div></div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-view="dashboard" aria-selected="true">Dashboard</button>
+      <button role="tab" data-view="learners" aria-selected="false">Learners</button>
+      <button role="tab" data-view="payments" aria-selected="false">Payments</button>
+      <button role="tab" data-view="charges" aria-selected="false">Charge fees</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="notice" id="notice" hidden></div>
+
+  <!-- DASHBOARD -->
+  <section class="view" id="view-dashboard">
+    <div class="stats">
+      <div class="stat"><span>Total charged</span><strong id="s-charged">KES 0</strong></div>
+      <div class="stat good"><span>Total collected</span><strong id="s-paid">KES 0</strong></div>
+      <div class="stat warn"><span>Outstanding</span><strong id="s-balance">KES 0</strong></div>
+      <div class="stat"><span>Collection rate</span><strong id="s-rate">0%</strong><div class="bar"><i id="s-bar"></i></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><h2>Balances by class</h2></div>
+        <table class="table" id="class-table"><thead><tr><th>Class</th><th class="n">Learners</th><th class="n">Charged</th><th class="n">Paid</th><th class="n">Balance</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Recent payments</h2></div>
+        <ul class="feed" id="recent"></ul>
+      </div>
+    </div>
+    <div class="card empty-state" id="empty" hidden>
+      <h2>No data yet</h2>
+      <p>Add learners, charge term fees and record payments, or load sample data to explore.</p>
+      <button class="btn" id="load-sample">Load sample data</button>
+    </div>
+  </section>
+
+  <!-- LEARNERS -->
+  <section class="view" id="view-learners" hidden>
+    <div class="card">
+      <div class="card-head">
+        <h2>Learners</h2>
+        <div class="tools">
+          <input type="search" id="search" placeholder="Search name or adm no…" aria-label="Search learners">
+          <select id="filter-class" aria-label="Filter by class"><option value="">All classes</option></select>
+          <label class="check"><input type="checkbox" id="only-owing"> Owing only</label>
+          <button class="btn btn-light" id="export">Export CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table class="table" id="learner-table">
+        <thead><tr><th>Adm no</th><th>Name</th><th>Class</th><th class="n">Charged</th><th class="n">Paid</th><th class="n">Balance</th><th></th></tr></thead>
+        <tbody></tbody></table></div>
+    </div>
+    <form class="card form" id="learner-form">
+      <h2>Add a learner</h2>
+      <div class="fields">
+        <label>Admission no<input name="adm" required placeholder="e.g. 1024"></label>
+        <label>Full name<input name="name" required placeholder="e.g. Amani Otieno"></label>
+        <label>Class<select name="grade" required></select></label>
+        <label>Parent phone<input name="phone" placeholder="0712 345 678"></label>
+      </div>
+      <button class="btn">Add learner</button>
+    </form>
+  </section>
+
+  <!-- PAYMENTS -->
+  <section class="view" id="view-payments" hidden>
+    <form class="card form" id="payment-form">
+      <h2>Record a payment</h2>
+      <div class="fields">
+        <label>Learner<input name="learner" list="learner-list" required placeholder="Type name or adm no"></label>
+        <label>Amount (KES)<input name="amount" type="number" min="1" step="1" required></label>
+        <label>Method<select name="method"><option>M-Pesa</option><option>Bank</option><option>Cheque</option></select></label>
+        <label>Reference<input name="ref" placeholder="e.g. SKL4X9ABC2" maxlength="20"></label>
+        <label>Date<input name="date" type="date" required></label>
+      </div>
+      <datalist id="learner-list"></datalist>
+      <button class="btn">Save payment</button>
+    </form>
+    <div class="card">
+      <div class="card-head"><h2>All payments</h2></div>
+      <div class="table-wrap"><table class="table" id="payment-table">
+        <thead><tr><th>Date</th><th>Learner</th><th>Method</th><th>Reference</th><th class="n">Amount</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- CHARGES -->
+  <section class="view" id="view-charges" hidden>
+    <form class="card form" id="charge-form">
+      <h2>Charge term fees to a class</h2>
+      <p class="muted">Adds the same charge to every learner in the class, e.g. "Term 1 2027 tuition".</p>
+      <div class="fields">
+        <label>Class<select name="grade" required></select></label>
+        <label>Description<input name="desc" required placeholder="Term 1 2027 tuition"></label>
+        <label>Amount (KES)<input name="amount" type="number" min="1" step="1" required></label>
+      </div>
+      <button class="btn">Charge class</button>
+    </form>
+    <div class="card danger-zone">
+      <h2>Data</h2>
+      <p class="muted">Everything is saved in this browser only (no server). Clear it to start fresh.</p>
+      <div class="tools"><button class="btn btn-light" id="load-sample-2">Load sample data</button><button class="btn btn-danger" id="clear">Clear all data</button></div>
+    </div>
+  </section>
+</main>
+
+<!-- STATEMENT -->
+<dialog id="statement">
+  <div class="stmt" id="stmt-body"></div>
+  <div class="stmt-actions"><button class="btn" onclick="window.print()">Print statement</button><button class="btn btn-light" id="close-stmt">Close</button></div>
+</dialog>
+
+<footer class="foot wrap">Built by <a href="https://brivocc.github.io">Bevon Manyara</a> · Demo app: data stays in your browser · <a href="https://github.com/brivocc/school-fees-tracker">Source on GitHub</a></footer>
+<script src="app.js"></script>
+</body>
+</html>
